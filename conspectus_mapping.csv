@@ -1,0 +1,321 @@
+conspect1,conspect2,conspect3,conspectus_name
+0,0,3,Systémy psaní a písma. Sémiotika (obecně)
+0,0,4,Počítačová věda. Výpočetní technika. Informační technologie
+0,0,5,Management. Řízení
+0,0,6,Metrologie. Standardizace
+0,0,7,Teorie systémů. Automatické systémy. Informační systémy. Kybernetika
+0,0,,Věda. Všeobecnosti. Základy vědy a kultury. Vědecká práce
+0,1,,Bibliografie. Katalogy
+0,2,2,Budovy
+0,2,2,Budovy
+0,2,3,Řízení knihoven
+0,2,4,Služby knihoven
+0,2,5,Organizace knihoven a knihovních fondů
+0,2,6,Odborné/speciální knihovny
+0,2,7,Univerzální knihovny. Veřejné knihovny. Soukromé knihovny
+0,2,8,Čtení. Četba
+0,2,,Knihovnictví. Informatika
+0,3,0,Všeobecná příručková díla
+0,5,0,Seriálové publikace. Periodika
+0,6,9,Muzea. Muzeologie. Muzejnictví. Výstavy
+0,6,,Organizace všeobecné povahy
+0,7,0,Noviny. Tisk. Žurnalistika
+0,8,,Souborná díla
+0,9,3,Prvotisky
+0,9,4,Staré tisky
+0,9,,Rukopisy
+0,9,,"Rukopisy, prvotisky, staré tisky. Vzácná a pozoruhodná díla"
+1,0,1,Filozofie
+1,1,,Metafyzika
+1,3,3,Ezoterismus. Okultismus
+1,3,,Filozofie ducha
+1,4,,Filozofické systémy a hlediska
+1,6,5,Teorie poznání. Epistemologie
+1,6,,Logika
+1,7,,Etika. Morální filozofie
+2,1,,Prehistorická a primitivní náboženství
+2,5,,Náboženství
+2,5,,"Náboženství, mytologie, kulty"
+2,6,,Judaismus
+2,7,,Křesťanství. Křesťanská církev všeobecně. Eklesiologie
+2,8,,Islám
+2,9,,Moderní duchovní hnutí
+2,,,Náboženství
+8,,,Literatura
+3,0,0,Společenské vědy
+3,0,4,Kulturní politika
+3,0,6,Kultura a instituce
+3,0,8,Sociografie
+3,1,1,Statistika
+3,1,4,Demografie. Populace
+3,1,6,Sociologie
+3,2,1,Politologie
+3,2,2,Politika a náboženství. Vztahy mezi církví a státem
+3,2,6,Otroctví
+3,2,8,Zastupitelské orgány. Vlády. Politické systémy jednotlivých zemí
+3,2,9,Politické strany a hnutí
+3,2,,Politika
+3,3,1,Práce
+3,3,4,Formy organizace a spolupráce v ekonomice
+3,3,8,Hospodářská a výrobní odvětví
+3,3,9,Obchod
+3,3,,Ekonomie
+3,4,1,Mezinárodní právo
+3,4,2,Ústavní právo. Správní právo
+3,4,3,Trestní právo
+3,4,4,Vojenské trestní právo
+3,4,6,Hospodářské právo
+3,4,7,Soukromé právo
+3,4,,Právo
+3,5,6,Vojenská služba. Pěchota
+5,0,,Obecné informace o přírodních vědách a matematice
+3,5,7,Motorizované jednotky. Jezdectvo
+3,5,8,Vojenské letectvo. Dělostřelectvo. Ženijní jednotky. Technické služby armády. Chemické vojsko
+3,5,9,Vojenské námořnictvo a loďstvo
+3,5,,Veřejná správa
+3,6,4,Sociální problémy vyžadující podporu a pomoc. Sociální zabezpečení
+3,6,5,Požadavky na bydlení a jejich uspokojování
+3,6,6,Ochrana spotřebitele. Chování spotřebitele
+3,6,8,Pojišťovnictví
+3,6,,Zajištění duševních a materiálních potřeb
+3,7,4,Výchova a vzdělávání dospělých. Mimoškolní výchova a vzdělávání
+3,7,6,Výchova a vzdělávání zvláštních skupin osob
+3,7,7,Odborné vzdělávání
+3,7,8,Vysoké školy
+3,7,,Výchova a vzdělávání
+3,9,3,Smrt. Pohřby. Obyčeje při úmrtí
+3,9,4,Veřejný a společenský život. Každodenní život
+3,9,5,Společenské chování. Etiketa
+3,9,8,Folklor. Lidové tradice
+3,9,,Kulturní antropologie. Etnologie. Etnografie
+3,,,Společenské vědy
+5,0,2,Životní prostředí a jeho ochrana
+5,0,4,Znečištění a poškození životního prostředí
+5,1,0,Obecné úvahy o matematice
+5,1,1,Teorie čísel
+5,1,2,Algebra
+5,1,4,Geometrie
+5,1,7,Matematická analýza
+5,1,,Matematika
+5,2,0,Astronomické přístroje a metody
+5,2,1,Teoretická astronomie. Nebeská mechanika
+5,2,8,Geodezie. Kartografie
+5,2,,Astronomie
+5,1,5,Topologie
+5,1,9,Kombinatorika. Teorie grafů. Matematická statistika. Operační výzkum. Matematické modelování
+3,5,2,"Stupně místní, oblastní a ústřední správy"
+2,2,,Náboženství Dálného východu. Indická náboženství. Hinduismus. Buddhismus
+2,7,1,"Křesťanské církve, sekty, denominace"
+5,3,1,Obecná mechanika. Mechanika pevných a tuhých těles
+5,3,2,Mechanika tekutin obecně. Mechanika kapalin
+5,3,3,Mechanika plynů. Aeromechanika. Fyzika plazmatu
+5,3,4,Mechanické kmity. Akustika
+5,3,5,Optika
+5,3,6,Teplo. Termodynamika
+5,3,7,Elektřina
+5,2,3,Sluneční soustava. Hvězdy. Vesmír
+5,3,9,Fyzikální stavba hmoty. Jaderná fyzika. Molekulární fyzika
+5,3,,Fyzika
+5,4,2,Praktická laboratorní chemie. Preparativní a experimentální chemie
+5,4,3,Analytická chemie
+5,4,4,Fyzikální chemie
+5,4,6,Anorganická chemie
+5,4,7,Organická chemie
+5,4,8,Krystalografie
+5,4,9,Mineralogie
+5,4,,Chemie. Mineralogické vědy
+5,5,0,Geofyzika. Geochemie. Geobiologie. Užitá geologie
+5,5,1,Geologie. Meteorologie. Klimatologie
+5,5,2,Petrologie
+5,5,3,Ložisková geologie
+5,5,6,Hydrologie
+5,5,,Vědy o Zemi. Geologické vědy
+5,6,,Paleontologie
+5,7,2,Fyzická antropologie
+5,7,4,Obecná ekologie
+5,7,5,Obecná genetika. Obecná cytogenetika. Evoluce
+5,7,6,Buněčná biologie. Cytologie
+5,7,7,Biochemie. Molekulární biologie. Biofyzika
+5,7,8,Virologie
+5,7,9,Mikrobiologie
+5,7,,Obecná biologie
+5,8,1,Obecná botanika
+8,1,1,Různé jazyky
+8,2,,Literatura různých forem a žánrů
+8,2,1,Literatura různých forem a žánrů
+5,8,,Botanika
+5,9,1,Obecná zoologie
+5,9,,Zoologie
+5,,,Přírodní vědy. Matematické vědy
+6,0,,Biotechnologie. Genetické inženýrství
+6,1,1,Anatomie člověka a srovnávací anatomie
+6,1,2,Fyziologie člověka a srovnávací fyziologie
+6,1,3,Hygiena. Lidské zdraví
+6,1,4,Veřejné zdraví a hygiena
+6,1,5,Farmacie. Farmakologie
+6,1,6,Patologie. Klinická medicína
+6,1,7,Ortopedie. Chirurgie. Oftalmologie
+6,1,8,Gynekologie. Porodnictví
+6,1,,Lékařské vědy. Lékařství
+6,2,0,Energetika
+6,2,1,Strojírenství
+5,9,9,Hominidae. Hominidi - lidé
+3,3,0,Ekonomické teorie
+3,7,3,Školy
+6,2,2,Hornictví
+6,2,3,Vojenská technika
+6,2,6,Vodní stavitelství. Vodní hospodářství
+6,2,4,Stavební inženýrství
+6,2,5,Pozemní komunikace. Železniční stavitelství
+6,2,8,Sanitární technika. Vodárenství. Odpadové hospodářství. Světelná technika
+6,2,9,Dopravní prostředky
+6,2,,Technika všeobecně
+6,3,0,Lesnictví
+6,3,9,Rybářství a myslivnost
+6,3,1,Zemědělství. Pedologie. Agrotechnika. Agroekologie
+6,3,2,Ochrana rostlin. Fytopatologie
+6,3,3,Rostlinná výroba
+6,3,4,Ovocnářství
+6,3,5,Zahrádkářství
+6,3,6,Chov zvířat. Živočišná výroba
+6,3,7,Živočišné produkty
+6,3,8,Včelařství
+6,3,,Zemědělství a příbuzné oblasti vědy a techniky
+6,4,1,Kuchařství. Potraviny. Vařená jídla
+6,4,0,Hotelnictví. Stravování
+6,4,2,Číšnictví. Servírování
+6,4,3,Byt. Místnosti. Vybavení bytu
+6,4,4,Bytové zařízení (sanitární)
+6,4,5,Nábytek
+3,3,6,Finance
+6,4,6,Odívání. Péče o tělo
+6,4,8,Praní. Čištění
+6,4,,Domácí hospodářství
+6,5,4,Telekomunikace a dálkové řízení
+6,5,5,Polygrafie. Vydavatelství a knižní obchod
+6,5,6,Doprava
+6,5,7,Účetnictví
+6,5,8,Řízení a správa podniku
+6,5,9,Reklama. Public relations. Média
+6,6,1,Chemikálie
+6,6,2,Výbušniny. Paliva
+6,6,3,Průmysl nápojů. Kvasný průmysl. Průmysl pochutin
+6,6,4,Potravinářský průmysl
+6,6,5,Oleje. Tuky. Vosky. Pojiva. Pryskyřice
+6,6,6,Sklářství. Keramika. Cement
+6,6,7,Průmysl barviv
+6,6,9,Metalurgie
+6,6,,Chemický průmysl. Chemická technologie
+6,7,1,Předměty z drahých kovů
+6,7,2,Předměty ze železa a oceli
+6,7,,Řemesla. Různá odvětví průmyslu
+6,7,3,Předměty z neželezných kovů
+6,7,4,Dřevo. Dřevařský průmysl
+6,7,5,Kožedělný průmysl
+6,7,6,Papírenský průmysl
+6,7,7,Textilní průmysl
+6,7,8,Průmysl makromolekulárních látek. Gumárenský průmysl. Průmysl plastů
+6,8,1,Přesná mechanika a přístroje
+6,8,2,Kovářství
+6,8,3,Železářství. Zámečnictví. Topná zařízení
+6,8,4,Nábytkářský průmysl
+6,8,5,Zpracování kůže. Obuvnictví
+6,8,6,Knihařství. Sklenářství. Kancelářské potřeby
+6,8,7,Oděvní průmysl. Kosmetika. Kadeřnictví. Péče o vzhled
+6,8,8,Dekorační předměty. Hračky. Galanterie
+6,9,1,Stavební hmoty
+6,9,2,Konstrukční prvky a části staveb
+6,9,3,Zednické práce
+6,9,4,Dřevěné stavby. Tesařství. Truhlářství
+6,9,6,Instalace v budovách
+6,9,8,Dokončovací práce
+6,9,,Stavebnictví
+7,1,2,Plánování krajiny. Parky. Zahrady
+7,1,,Územní plánování. Urbanismus. Památková péče
+7,0,1,Fine and decorative arts
+7,2,,Architektura
+7,3,,Sochařství
+7,3,,"Sochařství, keramika, porcelán, umělecké zpracování kovů"
+7,4,,Kresba. Umělecká řemesla
+7,4,1,Komiksy. Komiksové adaptace
+7,5,,Malířství
+7,6,,Grafické umění. Grafika
+7,7,,Fotografie. Fotografické postupy
+7,8,1,Hudební teorie
+7,8,3,Církevní hudba. Duchovní hudba. Náboženská hudba
+7,8,4,Vokální hudba
+7,8,5,Instrumentální hudba. Symfonická hudba. Hudba pro více nástrojů
+7,8,0,Hudební nástroje a příslušenství
+7,8,6,Hudba pro klávesové nástroje
+7,8,7,Hudba pro strunné a smyčcové nástroje
+7,8,8,Hudba pro dechové nástroje
+7,8,9,Hudba pro bicí nástroje
+7,8,,Hudba
+7,9,1,Film. Cirkus. Lidová zábava
+7,9,2,Divadlo. Divadelní představení
+6,9,9,Ochrana budov
+7,9,3,Společenská zábava
+7,9,5,Elektronické hry
+7,9,6,Sport. Hry. Tělesná cvičení
+7,9,7,Vodní sporty. Letecké sporty
+7,9,8,Jezdectví. Sporty se zvířaty
+7,9,9,Sportovní rybolov. Lovecký sport. Sportovní střelba
+7,9,,Rekreace. Volný čas. Zábava. Hry. Sport
+8,0,8,Literární styl. Literární činnost a technika. Efektivní využívání jazyka. Spisovatelská činnost
+8,0,,Filologie
+8,1,,Lingvistika. Jazyky
+8,2,1,Literatura v různých jazycích
+8,2,,Literatura. Literární život
+9,0,2,Archeologie
+9,0,3,Pravěk
+9,0,4,Kulturní památky historického období obecně
+9,0,8,Studium oblastí a lokalit obecně
+9,1,0,Geography and travel
+9,1,1,Obecná geografie. Systematická geografie
+9,1,2,Mapy. Atlasy. Glóby
+9,1,3,Regionální geografie
+9,1,,Geografie jako věda. Výzkum. Cestování
+9,2,9,Biografie
+9,3,0,Historická věda. Pomocné vědy historické. Archivnictví
+9,,,Geografie. Biografické studie. Dějiny
+1,,,Filozofie
+6,,,Užité vědy
+7,,,Umění
+9,3,,Dějiny
+3,2,3,Vnitropolitický vývoj
+3,2,4,Volby
+3,2,5,Mezinárodní migrace
+3,2,7,Mezinárodní vztahy
+3,3,2,Regionální ekonomie
+3,4,9,"Pracovní, sociální, stavební právo. Právo životního prostředí"
+3,5,1,"Úkoly veřejné správy, správní opatření, legislativa"
+3,9,1,"Oděv, móda, ozdoby"
+3,9,2,"Zvyky, mravy, obyčeje v soukromém životě"
+6,4,9,"Domácí péče o děti, nemocné a hosty"
+6,7,9,Výroba kabelů
+9,4,,Světové dějiny
+6,9,7,"Vytápění, větrání, klimatizace"
+7,9,4,"Deskové a stolní hry, logické hry, hry zručnosti"
+7,8,2,"Divadelní hudba. Opera, opereta, muzikál"
+0,6,1,Nevládní organizace a kooperace
+0,9,5,Vzácná díla
+0,,,"Počítačová věda, informace a obecné"
+1,2,2,Speciální metafyzika
+0,2,1,Vztahy knihoven a jiných institucí
+1,5,9,Vůle
+3,5,5,Vojenská věda
+0,3,,Obecné encyklopedie
+0,5,,Obecné sériové publikace
+0,7,,"Dokumentární média, žurnalistika, nakladatelství"
+1,0,,Obecné filosofie
+1,2,,"Epistemologie, kauzalita, konečnost, lidská rasa"
+1,5,,Psychologie
+3,0,,Obecné informace o sociálních vědách
+3,1,,Obecné statistiky
+3,2,,Politologie
+4,0,,Obecné informace o jazycích
+6,8,,Výroba výrobků pro zvláštní použití
+6,5,,Řízení podniku a pomocné služby
+9,0,,Obecných údajů o geografii a historii
+9,2,,"Životopis, genealogie, emblémy, odznaky"
+,,,

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="cs">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Knihy vydané v ČR</title>
+    <link rel="icon"
+          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📖</text></svg>">
+    <link rel="stylesheet" href="styles/app.css">
+</head>
+<body>
+    <header>
+        <div id="titleBlock">
+            <span class="heading" id="heading">Knihy publikované v ČR</span>
+        </div>
+
+        <div id="controlsBlock">
+            <div id="controlsTop">
+                <div id="yearSliderWrap">
+                    <div class="sliderStack">
+                        <div id="yearSlider"></div>
+                        <div id="yearTicks"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="controlsBottom">
+                <div id="btnCol">
+                    <button id="themeToggle" type="button">☀︎ / ☾</button>
+                    <button id="reset">Reset</button>
+                </div>
+                <span class="muted" id="stat"></span>
+            </div>
+        </div>
+
+        <!-- keep hidden selects for compatibility -->
+        <select id="s"></select>
+        <select id="e"></select>
+    </header>
+
+<div id="loading">
+    <div class="spinner"></div>
+    <div class="loadingText">Načítání dat…</div>
+</div>
+
+<div id="wrap">
+    <!-- 1) Sunburst -->
+    <section id="colSunburst" class="col card">
+        <div id="chart"></div>
+    </section>
+
+    <!-- 2) Detaily + language filter -->
+    <aside id="colDetails" class="col card">
+        <b>Detaily</b>
+
+        <div style="margin-top:12px">
+            <div class="muted">Interval:</div>
+            <div id="iv" class="details">—</div>
+
+            <div class="muted" style="margin-top:10px;">Počet knih:</div>
+            <div id="tot" class="details"><b>—</b></div>
+
+            <div class="muted" style="margin-top:10px;">Autoři:</div>
+            <div id="authors" class="details">—</div>
+
+            <div class="muted" style="margin-top:10px;">Nakladatelé:</div>
+            <div id="publishers" class="details">—</div>
+
+            <div class="muted" style="margin-top:10px;">Průměrný počet stran:</div>
+            <div id="avgPages" class="details">—</div>
+
+            <div class="muted" style="margin-top:10px;">Průměrný počet autorů jedné knihy:</div>
+            <div id="avgAuthors" class="details">—</div>
+
+           </div>
+
+        <br>
+        <div class="bad" id="err" style="display:none;margin-top:12px"></div>
+
+        <div id="langPanel" class="panelSection">
+            <br>
+            <b >Jazyky</b>
+            <p> Kniha může být napsána ve více jazycích.
+            <div id="langButtons" class="langButtons" style="margin-top:12px">
+                <button class="langBtn" type="button" data-lang="cze">CZE <span class="langPct" data-pct-for="cze">—</span></button>
+                <button class="langBtn" type="button" data-lang="eng">ENG <span class="langPct" data-pct-for="eng">—</span></button>
+                <button class="langBtn" type="button" data-lang="slo">SLO <span class="langPct" data-pct-for="slo">—</span></button>
+                <button class="langBtn" type="button" data-lang="ger">GER <span class="langPct" data-pct-for="ger">—</span></button>
+            </div>
+
+            <div class="langOtherRow">
+                <input id="langOther" class="langOther" type="text" inputmode="latin" autocomplete="off" spellcheck="false"
+                       placeholder="Jiné jazyky (např. rus/pol/fre/...)" />
+                <button id="langOtherApply" class="langApply" type="button">Hledat</button>
+            </div>
+            <div id="langMsg" class="langMsg"></div>
+        </div>
+    </aside>
+
+    <!-- 3) Right column charts -->
+    <section id="colCharts" class="col">
+        <div class="card chartCard" id="barchart"></div>
+        <div class="card chartCard" id="linechart"></div>
+    </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+<!-- noUiSlider -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.css">
+<script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.js"></script>
+    <script type="module" src="js/general.js"></script>
+
+
+</body>
+</html>
