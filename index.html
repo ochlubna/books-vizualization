@@ -9,34 +9,30 @@
     <link rel="stylesheet" href="styles/app.css">
 </head>
 <body>
-    <header>
-        <div id="titleBlock">
-            <span class="heading" id="heading">Knihy publikované v ČR</span>
-        </div>
+<header>
+    <div id="titleBlock">
+        <span class="heading" id="heading">Knihy publikované v ČR</span>
+    </div>
 
-        <div id="controlsBlock">
-            <div id="controlsTop">
-                <div id="yearSliderWrap">
-                    <div class="sliderStack">
-                        <div id="yearSlider"></div>
-                        <div id="yearTicks"></div>
-                    </div>
+    <div id="controlsBlock">
+        <div id="controlsTop">
+            <div id="yearSliderWrap">
+                <div class="sliderStack">
+                    <div id="yearSlider"></div>
+                    <div id="yearTicks"></div>
                 </div>
-            </div>
-
-            <div id="controlsBottom">
-                <div id="btnCol">
-                    <button id="themeToggle" type="button">☀︎ / ☾</button>
-                    <button id="reset">Reset</button>
-                </div>
-                <span class="muted" id="stat"></span>
             </div>
         </div>
 
-        <!-- keep hidden selects for compatibility -->
-        <select id="s"></select>
-        <select id="e"></select>
-    </header>
+        <div id="controlsBottom">
+            <div id="btnCol">
+                <button id="themeToggle" type="button">☀︎ / ☾</button>
+                <button id="reset">Reset</button>
+            </div>
+            <span class="muted" id="stat"></span>
+        </div>
+    </div>
+</header>
 
 <div id="loading">
     <div class="spinner"></div>
@@ -49,13 +45,18 @@
         <div id="chart"></div>
     </section>
 
-    <!-- 2) Detaily + language filter -->
+    <!-- 2) Details + language filter -->
     <aside id="colDetails" class="col card">
         <b>Detaily</b>
 
         <div style="margin-top:12px">
-            <div class="muted">Interval:</div>
-            <div id="iv" class="details">—</div>
+            <div class="muted">Interval let:</div>
+            <div class="yearInputs">
+                <input id="yearFrom" type="number" inputmode="numeric" class="yearInput" />
+                –
+                <input id="yearTo" type="number" inputmode="numeric" class="yearInput" />
+            </div>
+
 
             <div class="muted" style="margin-top:10px;">Počet knih:</div>
             <div id="tot" class="details"><b>—</b></div>
@@ -72,7 +73,7 @@
             <div class="muted" style="margin-top:10px;">Průměrný počet autorů jedné knihy:</div>
             <div id="avgAuthors" class="details">—</div>
 
-           </div>
+        </div>
 
         <br>
         <div class="bad" id="err" style="display:none;margin-top:12px"></div>
@@ -82,22 +83,24 @@
             <b >Jazyky</b>
             <p> Kniha může být napsána ve více jazycích.
             <div id="langButtons" class="langButtons" style="margin-top:12px">
+                <button class="langBtn" type="button" data-lang="all">vše <span class="langPct" data-pct-for="all">—</span></button>
                 <button class="langBtn" type="button" data-lang="cze">CZE <span class="langPct" data-pct-for="cze">—</span></button>
                 <button class="langBtn" type="button" data-lang="eng">ENG <span class="langPct" data-pct-for="eng">—</span></button>
                 <button class="langBtn" type="button" data-lang="slo">SLO <span class="langPct" data-pct-for="slo">—</span></button>
                 <button class="langBtn" type="button" data-lang="ger">GER <span class="langPct" data-pct-for="ger">—</span></button>
+                <button class="langBtn" type="button" data-lang="pol">POL <span class="langPct" data-pct-for="pol">—</span></button>
             </div>
 
             <div class="langOtherRow">
                 <input id="langOther" class="langOther" type="text" inputmode="latin" autocomplete="off" spellcheck="false"
-                       placeholder="Jiné jazyky (např. rus/pol/fre/...)" />
+                       placeholder="Jiné jazyky (např. rus/fre/ukr/...)" />
                 <button id="langOtherApply" class="langApply" type="button">Hledat</button>
             </div>
             <div id="langMsg" class="langMsg"></div>
         </div>
     </aside>
 
-    <!-- 3) Right column charts -->
+    <!-- 3) Barchart + linechart -->
     <section id="colCharts" class="col">
         <div class="card chartCard" id="barchart"></div>
         <div class="card chartCard" id="linechart"></div>
@@ -107,10 +110,10 @@
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
-<!-- noUiSlider -->
+<!-- Slider -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.css">
 <script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.js"></script>
-    <script type="module" src="js/general.js"></script>
+<script type="module" src="js/general.js"></script>
 
 
 </body>
