@@ -5,13 +5,13 @@ import {
     withLoading,
 } from "./config.js";
 
-import { CONSPECT1_COLORS, derivedColor } from "./colors.js";
+import {CONSPECT1_COLORS, derivedColor} from "./colors.js";
 
 
 const $ = (id) => document.getElementById(id);
 
 const yearFromInput = $("yearFrom");
-const yearToInput   = $("yearTo");
+const yearToInput = $("yearTo");
 const minY = 1995, maxY = 2023;
 
 const stat = $("stat"), err = $("err");
@@ -24,15 +24,14 @@ const avgAuthorsEl = $("avgAuthors");
 const heading = $("heading");
 const yearSliderEl = $("yearSlider");
 
-// Language filter UI (optional if DOM not present)
 const langButtonsWrap = $("langButtons");
 const langOtherInput = $("langOther");
 const langOtherApply = $("langOtherApply");
 const langMsg = $("langMsg");
 
-const chart = echarts.init($("chart"), null, { renderer: "canvas" });
-const barChart = echarts.init($("barchart"), null, { renderer: "canvas" });
-const lineChart = echarts.init($("linechart"), null, { renderer: "canvas" });
+const chart = echarts.init($("chart"), null, {renderer: "canvas"});
+const barChart = echarts.init($("barchart"), null, {renderer: "canvas"});
+const lineChart = echarts.init($("linechart"), null, {renderer: "canvas"});
 
 let lcHoveredSeriesName = null;
 let lcAxisDataIndex = null;
@@ -49,7 +48,7 @@ let mapC3 = new Map();
 let minYGlobal = null;
 let maxYGlobal = null;
 
-let stack = [{ depth: 0, c1: null, c2: null }];
+let stack = [{depth: 0, c1: null, c2: null}];
 let zrCenterClickHandler = null;
 
 let slider = null;
@@ -57,7 +56,6 @@ let slider = null;
 let lineHoverSeriesName = null;
 let lastLineTipDataIndex = null;
 
-// --- Language filter state ---
 const FIXED_LANGS = ["cze", "eng", "slo", "ger", "pol"]; // buttons shown in UI
 let activeLanguage = "all";
 let availableLanguages = new Set();
@@ -94,25 +92,25 @@ function labelFor(depth, bucket, ctx) {
 }
 
 function currentHeading(view) {
-    if (view.depth === 0) return { title: "Knihy publikované v ČR" };
+    if (view.depth === 0) return {title: "Knihy publikované v ČR"};
 
     const c1Name = (view.c1 === NO_DATA_KEY)
         ? "(bez další kategorie)"
         : (mapC1.get(view.c1) ?? view.c1);
 
-    if (view.depth === 1) return { title: c1Name };
+    if (view.depth === 1) return {title: c1Name};
 
     const c2Name = (view.c2 === NO_DATA_KEY)
         ? "(bez další kategorie)"
         : (mapC2.get(`${view.c1}|${view.c2}`) ?? view.c2);
 
-    return { title: `${c1Name} → ${c2Name}` };
+    return {title: `${c1Name} → ${c2Name}`};
 }
 
 
 async function loadMapping() {
     const text = await (await fetch(MAP)).text();
-    const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
+    const parsed = Papa.parse(text, {header: true, skipEmptyLines: true});
     const rows = parsed.data ?? [];
     if (!rows.length) throw new Error("Mapping CSV parsed empty.");
 
@@ -130,24 +128,20 @@ async function loadMapping() {
         const c3 = normBucket(r[c3Col]);
         const name = String(r[nmCol] ?? "").trim();
         if (!name || c1 === "") continue;
-
-        // top-level
         if (isMissing(r[c2Col]) && isMissing(r[c3Col])) m1.set(c1, name);
-
-        // 2nd-level
         if (!isMissing(r[c2Col]) && isMissing(r[c3Col]) && c2 !== "") m2.set(`${c1}|${c2}`, name);
-
-        // 3rd-level
         if (!isMissing(r[c2Col]) && !isMissing(r[c3Col]) && c2 !== "" && c3 !== "") m3.set(`${c1}|${c2}|${c3}`, name);
     }
 
-    mapC1 = m1; mapC2 = m2; mapC3 = m3;
+    mapC1 = m1;
+    mapC2 = m2;
+    mapC3 = m3;
 }
 
 async function initDuckDB() {
     stat.textContent = "Init DuckDB…";
     const bundle = await duckdb.selectBundle(duckdb.getJsDelivrBundles());
-    const worker_url = URL.createObjectURL(new Blob([`importScripts("${bundle.mainWorker}");`], {type:"text/javascript"}));
+    const worker_url = URL.createObjectURL(new Blob([`importScripts("${bundle.mainWorker}");`], {type: "text/javascript"}));
     const worker = new Worker(worker_url);
 
     const db = new duckdb.AsyncDuckDB(new duckdb.ConsoleLogger(), worker);
@@ -158,7 +152,6 @@ async function initDuckDB() {
     const resp = await fetch(BOOKS);
     if (!resp.ok) throw new Error(`Fetch failed for ${BOOKS}: HTTP ${resp.status}`);
     await db.registerFileBuffer(BOOKS, new Uint8Array(await resp.arrayBuffer()));
-    // After: await db.registerFileBuffer(...)
 
     stat.textContent = "Preparing table…";
 
@@ -178,18 +171,17 @@ async function initDuckDB() {
     CAST(avg_authors_per_book AS DOUBLE) AS avg_authors_per_book
   FROM read_csv_auto('${BOOKS}')
 `);
-
 }
 
 async function yearBounds() {
     const q = `
-            SELECT MIN(CAST(start_interval_year AS INT)) minY,
-                   MAX(CAST(end_interval_year   AS INT)) maxY
-            FROM read_csv_auto('${BOOKS}')
-            WHERE language='all'
-        `;
+        SELECT MIN(CAST(start_interval_year AS INT)) minY,
+               MAX(CAST(end_interval_year AS INT))   maxY
+        FROM read_csv_auto('${BOOKS}')
+        WHERE language ='all'
+    `;
     const r = (await conn.query(q)).toArray()[0];
-    return { minY: Number(r.minY), maxY: Number(r.maxY) };
+    return {minY: Number(r.minY), maxY: Number(r.maxY)};
 }
 
 function initYearInputs(minY, maxY) {
@@ -197,7 +189,7 @@ function initYearInputs(minY, maxY) {
     const e0 = Math.max(minY, Math.min(maxY, DEFAULT.e));
 
     yearFromInput.value = String(s0);
-    yearToInput.value   = String(e0);
+    yearToInput.value = String(e0);
 }
 
 function initYearSlider(minY, maxY) {
@@ -213,7 +205,7 @@ function initYearSlider(minY, maxY) {
         start: [s0, e0],
         connect: true,
         step: 1,
-        range: { min: minY, max: maxY },
+        range: {min: minY, max: maxY},
         tooltips: [true, true],
         format: {
             to: (v) => String(Math.round(v)),
@@ -227,10 +219,9 @@ function initYearSlider(minY, maxY) {
         const s = Math.min(a, b);
         const e = Math.max(a, b);
         yearFromInput.value = String(s);
-        yearToInput.value   = String(e);
+        yearToInput.value = String(e);
     });
 
-    // refresh only when user releases handle
     slider.on("set", () => {
         resetAll();
     });
@@ -250,7 +241,6 @@ function syncInputsToSlider() {
     const s = Math.min(a, b);
     const e = Math.max(a, b);
 
-    // This triggers slider's "set" event => resetAll()
     slider.set([s, e]);
 }
 
@@ -262,7 +252,7 @@ async function loadLanguages() {
     const q = `
         SELECT DISTINCT TRIM(CAST(language AS VARCHAR)) AS language
         FROM read_csv_auto('${BOOKS}')
-        WHERE language IS NOT NULL AND TRIM(CAST(language AS VARCHAR)) != ''
+        WHERE language IS NOT NULL AND TRIM (CAST (language AS VARCHAR)) != ''
     `;
 
     const res = await conn.query(q);
@@ -274,13 +264,19 @@ async function loadLanguages() {
     availableLanguages = set;
 }
 
-function setActiveLanguage(lang, { silent = false } = {}) {
+function setActiveLanguage(lang, {silent = false} = {}) {
     const l = String(lang ?? '').trim().toLowerCase();
     if (!l) return;
 
-    if (l === activeLanguage) {activeLanguage = 'all'}
-    else {activeLanguage = l;}
-    try { localStorage.setItem('lang', activeLanguage); } catch {}
+    if (l === activeLanguage) {
+        activeLanguage = 'all'
+    } else {
+        activeLanguage = l;
+    }
+    try {
+        localStorage.setItem('lang', activeLanguage);
+    } catch {
+    }
     updateLanguageUI();
     if (!silent) {
         withLoading(async () => {
@@ -292,13 +288,11 @@ function setActiveLanguage(lang, { silent = false } = {}) {
 function updateLanguageUI() {
     if (!langButtonsWrap) return;
 
-    // highlight buttons
     for (const btn of langButtonsWrap.querySelectorAll('button[data-lang]')) {
         const l = btn.getAttribute('data-lang')?.toLowerCase();
         btn.classList.toggle('active', l === activeLanguage);
     }
 
-    // message
     if (langMsg) {
         if (activeLanguage === 'all') langMsg.textContent = '';
         else langMsg.textContent = `Filtr: ${activeLanguage}`;
@@ -308,7 +302,6 @@ function updateLanguageUI() {
 function initLanguageUI() {
     if (!langButtonsWrap) return;
 
-    // button clicks
     langButtonsWrap.addEventListener('click', (ev) => {
         const btn = ev.target?.closest?.('button[data-lang]');
         if (!btn) return;
@@ -322,7 +315,6 @@ function initLanguageUI() {
         if (!raw) return;
 
         if (!availableLanguages || availableLanguages.size === 0) {
-            // languages not loaded yet: accept, but might yield 0 results
             setActiveLanguage(raw);
             return;
         }
@@ -358,27 +350,24 @@ async function queryBucketsForView(s, e, view, lang = activeLanguage) {
     if (view.depth >= 2) filters.push(`TRIM(CAST(conspect2 AS VARCHAR)) = '${view.c2}'`);
 
     const q = `
-            WITH base AS (
-                SELECT TRIM(CAST(${col} AS VARCHAR)) AS v, books
-                FROM read_csv_auto('${BOOKS}')
-                WHERE ${filters.join(" AND ")}
-            ),
-            bucketed AS (
-                SELECT
-                    CASE
-                        WHEN v IS NULL OR v = '' THEN ''
-                        WHEN v ~ '^[0-9]$' THEN v
-                        WHEN v ~ '^[0-9]\\.0$' THEN LEFT(v, 1)
-                        ELSE NULL
-                    END AS b,
+        WITH base AS (SELECT TRIM(CAST(${col} AS VARCHAR)) AS v, books
+                      FROM read_csv_auto('${BOOKS}')
+                      WHERE ${filters.join(" AND ")}),
+             bucketed AS (SELECT CASE
+                                     WHEN v IS NULL OR v = '' THEN ''
+                                     WHEN v ~ '^[0-9]$' THEN v
+                                     WHEN v ~ '^[0-9]\\.0$' THEN LEFT (v, 1)
+            ELSE NULL
+        END
+        AS b,
                     books
                 FROM base
             )
-            SELECT b AS bucket, SUM(books) AS books
-            FROM bucketed
-            WHERE b IS NOT NULL
-            GROUP BY b
-        `;
+        SELECT b AS bucket, SUM(books) AS books
+        FROM bucketed
+        WHERE b IS NOT NULL
+        GROUP BY b
+    `;
 
     const rows = (await conn.query(q)).toArray().map(r => ({
         key: String(r.bucket ?? ""),
@@ -387,7 +376,7 @@ async function queryBucketsForView(s, e, view, lang = activeLanguage) {
 
     const m = new Map(rows.map(d => [d.key, d.value]));
     return BUCKETS
-        .map(k => ({ key: k, value: m.get(k) ?? 0 }))
+        .map(k => ({key: k, value: m.get(k) ?? 0}))
         .filter(d => d.value > 0);
 }
 
@@ -401,21 +390,19 @@ async function queryDetailsForSelection(s, e, view, lang = activeLanguage) {
     if (view.depth >= 1) filters.push(`TRIM(CAST(conspect1 AS VARCHAR)) = '${sqlStr(view.c1)}'`);
     if (view.depth >= 2) filters.push(`TRIM(CAST(conspect2 AS VARCHAR)) = '${sqlStr(view.c2)}'`);
 
-    // avg_authors_per_book je už "průměr na knihu" v datasetu,
-    // takže pro agregaci přes více řádků děláme vážený průměr podle počtu knih.
     const q = `
-    SELECT
-      SUM(books)        AS books,
-      SUM(authors)      AS authors,
-      SUM(publishers)   AS publishers,
-      SUM(pages)        AS pages,
-      CASE WHEN SUM(books) > 0
-        THEN SUM(avg_authors_per_book * books) / SUM(books)
-        ELSE NULL
-      END AS avg_authors_per_book_weighted
-    FROM read_csv_auto('${BOOKS}')
-    WHERE ${filters.join(" AND ")}
-  `;
+        SELECT SUM(books)      AS books,
+               SUM(authors)    AS authors,
+               SUM(publishers) AS publishers,
+               SUM(pages)      AS pages,
+               CASE
+                   WHEN SUM(books) > 0
+                       THEN SUM(avg_authors_per_book * books) / SUM(books)
+                   ELSE NULL
+                   END         AS avg_authors_per_book_weighted
+        FROM read_csv_auto('${BOOKS}')
+        WHERE ${filters.join(" AND ")}
+    `;
 
     const row = (await conn.query(q)).toArray()[0] ?? {};
     return {
@@ -446,8 +433,7 @@ async function queryBooksPerYear(s, e, view, lang = activeLanguage) {
     }
 
     const q = `
-        SELECT
-            CAST(start_interval_year AS INT) AS year,
+        SELECT CAST(start_interval_year AS INT) AS year,
             SUM(books) AS books
         FROM read_csv_auto('${BOOKS}')
         WHERE ${filters.join(" AND ")}
@@ -478,10 +464,9 @@ async function queryLinesForView(s, e, view, lang = activeLanguage) {
     if (view.depth >= 2) filters.push(`TRIM(CAST(conspect2 AS VARCHAR)) = '${view.c2}'`);
 
     const q = `
-        SELECT 
-            CAST(start_interval_year AS INT) as year,
-            TRIM(CAST(${targetCol} AS VARCHAR)) as category,
-            SUM(books) as books
+        SELECT CAST(start_interval_year AS INT) as year,
+            TRIM(CAST(${targetCol} AS VARCHAR)) as category
+             , SUM (books) as books
         FROM read_csv_auto('${BOOKS}')
         WHERE ${filters.join(" AND ")}
         GROUP BY year, category
@@ -513,28 +498,22 @@ async function queryLanguageTotalsForSelection(s, e, view, languages) {
     const inList = langs.map(l => `'${sqlStr(l)}'`).join(",");
 
     const q = `
-        WITH base AS (
-            SELECT
-                TRIM(CAST(language AS VARCHAR)) AS language,
-                TRIM(CAST(${col} AS VARCHAR)) AS v,
-                books
-            FROM read_csv_auto('${BOOKS}')
-            WHERE ${filters.join(" AND ")}
-              AND TRIM(CAST(language AS VARCHAR)) IN (${inList})
-        ),
-        bucketed AS (
-            SELECT
-                language,
-                CASE
-                    WHEN v IS NULL OR v = '' THEN ''
-                    WHEN v ~ '^[0-9]$' THEN v
-                    WHEN v ~ '^[0-9]\\.0$' THEN LEFT(v, 1)
-                    ELSE NULL
-                END AS b,
-                books
-            FROM base
-        )
-        SELECT language, SUM(books) AS books
+        WITH base AS (SELECT TRIM(CAST(language AS VARCHAR)) AS language, TRIM (CAST (${col} AS VARCHAR)) AS v, books
+        FROM read_csv_auto('${BOOKS}')
+        WHERE ${filters.join(" AND ")}
+          AND TRIM (CAST (language AS VARCHAR)) IN (${inList})
+            )
+            , bucketed AS (
+        SELECT
+            language, CASE
+            WHEN v IS NULL OR v = '' THEN ''
+            WHEN v ~ '^[0-9]$' THEN v
+            WHEN v ~ '^[0-9]\\.0$' THEN LEFT (v, 1)
+            ELSE NULL
+            END AS b, books
+        FROM base
+            )
+        SELECT language, SUM (books) AS books
         FROM bucketed
         WHERE b IS NOT NULL
         GROUP BY language
@@ -546,13 +525,11 @@ async function queryLanguageTotalsForSelection(s, e, view, languages) {
         const l = String(r.language ?? '').trim().toLowerCase();
         m.set(l, Number(r.books ?? 0));
     }
-    // ensure keys exist with 0
     for (const l of langs) if (!m.has(l)) m.set(l, 0);
     return m;
 }
 
 function updateLanguagePercentages(langStats) {
-    // Supports both Map (preferred) and plain object.
     const get = (k) => {
         if (!langStats) return 0;
         if (langStats instanceof Map) return Number(langStats.get(k) ?? 0);
@@ -569,14 +546,12 @@ function updateLanguagePercentages(langStats) {
             pct = (lang === activeLanguage) ? 100 : 0;
         } else {
             const num = get(lang);
-            pct = totalAll > 0 ? Math.round((num / totalAll) * 1000)/10 : 0;
+            pct = totalAll > 0 ? Math.round((num / totalAll) * 1000) / 10 : 0;
         }
 
         el.textContent = `${pct}%`;
     });
 }
-
-
 
 
 function updateSide(s, e, view, total) {
@@ -601,9 +576,7 @@ function updateDetails(d) {
     const avgPages = d.pages / d.books;
     avgPagesEl.textContent = `${avgPages.toFixed(0)}`;
 
-    // buď přímo z datasetu (avg_authors_per_book), nebo váženě spočítané v dotazu
     avgAuthorsEl.textContent = `${Number(d.avg_authors_per_book).toFixed(2)}`;
-
 }
 
 
@@ -617,7 +590,7 @@ function setCenterBackHandler() {
         const w = chart.getWidth(), h = chart.getHeight();
         const cx = w / 2, cy = h / 2;
         const dx = ev.offsetX - cx, dy = ev.offsetY - cy;
-        const dist = Math.sqrt(dx*dx + dy*dy);
+        const dist = Math.sqrt(dx * dx + dy * dy);
 
         const R = Math.min(w, h) / 2;
         const inner = R * 0.55;
@@ -630,19 +603,18 @@ function setCenterBackHandler() {
         }
 
     };
-
     zr.on("click", zrCenterClickHandler);
 }
 
 function renderChart(data, s, e, view) {
     const css = getComputedStyle(document.body);
     const chartBorder = css.getPropertyValue("--chart-border").trim();
-    const labelColor  = css.getPropertyValue("--text").trim();
-    const mutedColor  = css.getPropertyValue("--muted").trim();
-    const centerFill  = css.getPropertyValue("--center-fill").trim();
-    const centerStroke= css.getPropertyValue("--center-stroke").trim();
+    const labelColor = css.getPropertyValue("--text").trim();
+    const mutedColor = css.getPropertyValue("--muted").trim();
+    const centerFill = css.getPropertyValue("--center-fill").trim();
+    const centerStroke = css.getPropertyValue("--center-stroke").trim();
 
-    const total = data.reduce((a,d)=>a+d.value,0);
+    const total = data.reduce((a, d) => a + d.value, 0);
     updateSide(s, e, view, total);
 
     chart.setOption({
@@ -657,28 +629,21 @@ function renderChart(data, s, e, view) {
             type: "pie",
             radius: ["55%", "85%"],
             minShowLabelAngle: 10,
-            itemStyle: { borderColor: chartBorder, borderWidth: 2 },
+            itemStyle: {borderColor: chartBorder, borderWidth: 2},
             label: {
                 color: labelColor,
                 fontSize: 11,
                 formatter: (p) => `${p.name}\n${fmt(p.value)}`
             },
-            labelLine: { lineStyle: { color: mutedColor  } },
+            labelLine: {lineStyle: {color: mutedColor}},
             data: data.map(d => {
                 const key = d.key;
 
-                // base color always comes from conspect1 selection:
-                // depth 0: slice IS conspect1 key
-                // depth 1/2: parent conspect1 is view.c1
                 const parentC1 = (view.depth === 0) ? key : view.c1;
                 const base = CONSPECT1_COLORS[parentC1] ?? "#64748b";
 
                 let color = base;
-
-                // derive colors for lower layers
                 if (view.depth >= 1) {
-                    // depth 1: vary by conspect2 key
-                    // depth 2: vary by conspect3 key (still anchored to conspect1 base)
                     color = derivedColor(base, parentC1, key, view.depth);
                 }
 
@@ -686,7 +651,7 @@ function renderChart(data, s, e, view) {
                     name: labelFor(view.depth, key, view),
                     value: d.value,
                     key,
-                    itemStyle: { color }
+                    itemStyle: {color}
                 };
             })
         }],
@@ -696,8 +661,18 @@ function renderChart(data, s, e, view) {
             top: "middle",
             silent: true,
             children: [
-                { type: "circle", shape: { r: 70 }, style: { fill: centerFill, stroke: centerStroke, lineWidth: 1 } },
-                { type: "text", style: { text: (stack.length > 1 ? "◀ zpět" : "zvol kategorii"), fill: mutedColor, font: "12px system-ui", align: "center", verticalAlign: "middle" }, x: 0, y: 0 }
+                {type: "circle", shape: {r: 70}, style: {fill: centerFill, stroke: centerStroke, lineWidth: 1}},
+                {type: "text",
+                    style: {
+                        text: (stack.length > 1 ? "◀ zpět" : "zvol kategorii"),
+                        fill: mutedColor,
+                        font: "12px system-ui",
+                        align: "center",
+                        verticalAlign: "middle"
+                    },
+                    x: 0,
+                    y: 0
+                }
             ]
         }]
     }, true);
@@ -717,12 +692,12 @@ function renderChart(data, s, e, view) {
 
         if (cur.depth === 0) {
             withLoading(async () => {
-                stack.push({ depth: 1, c1: key, c2: null });
+                stack.push({depth: 1, c1: key, c2: null});
                 await refresh();
             });
         } else if (cur.depth === 1) {
             withLoading(async () => {
-                stack.push({ depth: 2, c1: cur.c1, c2: key });
+                stack.push({depth: 2, c1: cur.c1, c2: key});
                 await refresh();
             });
         }
@@ -755,7 +730,7 @@ function renderBarChart(rows, view) {
                     .getPropertyValue('--muted')
             }
         },
-        grid: { top: 50, right: 20, bottom: 40, left: 60 },
+        grid: {top: 50, right: 20, bottom: 40, left: 60},
         tooltip: {
             trigger: "axis",
             formatter: (params) => `<b>${params[0].name}</b><br/>${fmt(params[0].value)} knih`
@@ -763,18 +738,18 @@ function renderBarChart(rows, view) {
         xAxis: {
             type: "category",
             data: rows.map(d => d.year),
-            axisLabel: { color: mutedColor, fontSize: 10 }
+            axisLabel: {color: mutedColor, fontSize: 10}
         },
         yAxis: {
             type: "value",
-            axisLabel: { color: mutedColor, fontSize: 10 },
-            splitLine: { lineStyle: { opacity: 0.1 } }
+            axisLabel: {color: mutedColor, fontSize: 10},
+            splitLine: {lineStyle: {opacity: 0.1}}
         },
         series: [{
             type: "bar",
             data: rows.map(d => d.value),
-            itemStyle: { color: barColor, borderRadius: [4, 4, 0, 0] },
-            emphasis: { itemStyle: { opacity: 0.8 } }
+            itemStyle: {color: barColor, borderRadius: [4, 4, 0, 0]},
+            emphasis: {itemStyle: {opacity: 0.8}}
         }]
     }, true);
 }
@@ -787,7 +762,7 @@ function renderLineChart(rows, view) {
     const categories = [...new Set(rows.map(d => d.category))];
 
     const byCat = new Map();
-    for (const { year, category, value } of rows) {
+    for (const {year, category, value} of rows) {
         if (!byCat.has(category)) byCat.set(category, new Map());
         byCat.get(category).set(year, value);
     }
@@ -806,17 +781,14 @@ function renderLineChart(rows, view) {
             type: "line",
             smooth: true,
             symbol: "none",
-            lineStyle: { width: 2 },
-            emphasis: { focus: "series" },
-            itemStyle: { color },
+            lineStyle: {width: 2},
+            emphasis: {focus: "series"},
+            itemStyle: {color},
             data: years.map(y => byCat.get(cat)?.get(y) ?? 0)
         };
     });
 
-    // --- NEW: keep track of which line is currently hovered ---
-    // Put this near the top-level of your file if you prefer, but this works too.
-    if (!renderLineChart._hover) renderLineChart._hover = { seriesName: null };
-    const hoverState = renderLineChart._hover;
+    if (!renderLineChart._hover) renderLineChart._hover = {seriesName: null};
 
     lineChart.setOption({
         backgroundColor: "transparent",
@@ -831,9 +803,9 @@ function renderLineChart(rows, view) {
                 color: getComputedStyle(document.body).getPropertyValue("--muted")
             }
         },
-        grid: { top: 50, right: 20, bottom: 40, left: 60 },
+        grid: {top: 50, right: 20, bottom: 40, left: 60},
         legend: categories.length <= 6
-            ? { bottom: 0, textStyle: { color: mutedColor } }
+            ? {bottom: 0, textStyle: {color: mutedColor}}
             : undefined,
         tooltip: {
             trigger: "axis",
@@ -860,13 +832,13 @@ function renderLineChart(rows, view) {
         xAxis: {
             type: "category",
             data: years,
-            axisLabel: { color: mutedColor, fontSize: 10 },
-            axisLine: { lineStyle: { color: mutedColor, opacity: 0.4 } }
+            axisLabel: {color: mutedColor, fontSize: 10},
+            axisLine: {lineStyle: {color: mutedColor, opacity: 0.4}}
         },
         yAxis: {
             type: "value",
-            axisLabel: { color: mutedColor, fontSize: 10 },
-            splitLine: { lineStyle: { opacity: 0.1 } }
+            axisLabel: {color: mutedColor, fontSize: 10},
+            splitLine: {lineStyle: {opacity: 0.1}}
         },
         series
     }, true);
@@ -877,16 +849,12 @@ function renderLineChart(rows, view) {
         const info = e?.axesInfo?.[0];
         if (!info) return;
 
-        // index on x-axis
-        lcAxisDataIndex = info.value; // for category axis this is usually the category value
-        // BUT we need dataIndex; seriesData[0].dataIndex is safest when present:
+        lcAxisDataIndex = info.value;
         const sd = info.seriesData;
 
         if (sd && sd.length) {
-            // Pick the series "under" the pointer. If multiple, you can choose max value etc.
             lcHoveredSeriesName = sd[0].seriesName;
 
-            // Force re-render tooltip so formatter runs with updated lcHoveredSeriesName
             lineChart.dispatchAction({
                 type: "showTip",
                 seriesIndex: sd[0].seriesIndex,
@@ -914,23 +882,19 @@ async function refresh() {
         queryDetailsForSelection(s, e, view, activeLanguage),
     ]);
 
-    // language UI always
     updateLanguagePercentages(langTotals);
-
-    // details + header always (even if charts have no rows)
     lastDetails = details;
 
     const totalBooks = Number(details?.books ?? 0);
-    updateSide(s, e, view, totalBooks);   // interval + total + heading
-    updateDetails(details);               // <-- NEW: fill authors/publishers/avg/illustrated
+    updateSide(s, e, view, totalBooks);
+    updateDetails(details);
 
-    // no data: clear charts but keep UI consistent
     if (!pieRows.length) {
         chart.clear();
         barChart.clear();
         lineChart.clear();
         lastDetails = null;
-        updateDetails(null);                // <-- NEW: set — everywhere
+        updateDetails(null);
         stat.textContent = "No data";
         return;
     }
@@ -943,7 +907,7 @@ async function refresh() {
 
 function resetAll() {
     withLoading(async () => {
-        stack = [{ depth: 0, c1: null, c2: null }];
+        stack = [{depth: 0, c1: null, c2: null}];
         await refresh();
     });
 }
@@ -954,7 +918,7 @@ function renderYearTicks(minY, maxY) {
     ticksEl.innerHTML = "";
 
     for (let y = minY; y <= maxY; y++) {
-        if (y % 10 !== 0 && y !== minY && y !== maxY) continue; // only decades
+        if (y % 10 !== 0 && y !== minY && y !== maxY) continue;
         const span = document.createElement("span");
         span.className = "yearTick";
         span.textContent = String(y);
@@ -975,7 +939,8 @@ function applyTheme(light) {
 
         try {
             localStorage.setItem("theme", light ? "light" : "dark");
-        } catch {}
+        } catch {
+        }
 
         await refresh();
     });
@@ -1001,17 +966,17 @@ function escapeHtml(s) {
         await initDuckDB();
         await loadLanguages();
 
-        // restore language preference if possible
         try {
             const storedLang = localStorage.getItem('lang');
             if (storedLang) {
                 const l = storedLang.trim().toLowerCase();
                 if (!availableLanguages.size || availableLanguages.has(l)) {
-                    setActiveLanguage(l, { silent: true });
+                    setActiveLanguage(l, {silent: true});
                 }
             }
-        } catch {}
-        const { minY, maxY } = await yearBounds();
+        } catch {
+        }
+        const {minY, maxY} = await yearBounds();
         minYGlobal = minY;
         maxYGlobal = maxY;
 
@@ -1021,7 +986,10 @@ function escapeHtml(s) {
         if (minYGlobal != null) renderYearTicks(minYGlobal, maxYGlobal);
 
         let stored = null;
-        try { stored = localStorage.getItem("theme"); } catch {}
+        try {
+            stored = localStorage.getItem("theme");
+        } catch {
+        }
         applyTheme(stored === "light");
 
         $("themeToggle").onclick = () => applyTheme(!isLight());
@@ -1031,7 +999,7 @@ function escapeHtml(s) {
             // reset slider + drill stack
             const s0 = Math.max(minY, Math.min(maxY, DEFAULT.s));
             const e0 = Math.max(minY, Math.min(maxY, DEFAULT.e));
-            slider.set([s0, e0]); // triggers resetAll via 'set'
+            slider.set([s0, e0]);
         };
 
         await resetAll();
