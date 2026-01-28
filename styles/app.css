@@ -1,45 +1,56 @@
-:root{
+/* =========================
+   Theme variables
+   ========================= */
+
+:root {
     --bg: #0b0f14;
     --text: #e8eef6;
     --muted: #9bb0c6;
+
     --panel: #111826;
     --border: #142033;
-    --control-bg:#0f1726;
-    --control-border:#22314a;
-    --tick:#22314a;
 
-    --chart-border:#0b0f14;            /* slice separator */
-    --center-fill: rgba(15,23,38,.92);
-    --center-stroke:#22314a;
+    --control-bg: #0f1726;
+    --control-border: #22314a;
+    --tick: #22314a;
 
-    --loader-bg: rgba(11,15,20,.85);
+    --chart-border: #0b0f14;
+    --center-fill: rgba(15, 23, 38, 0.92);
+    --center-stroke: #22314a;
 
-    --slider-connect:#69B38C;
-    --slider-handle:#e8eef6;
-    --slider-handle-border:#22314a;
+    --loader-bg: rgba(11, 15, 20, 0.85);
+
+    --slider-connect: #69b38c;
+    --slider-handle: #e8eef6;
+    --slider-handle-border: #22314a;
 }
 
-body.light{
+body.light {
     --bg: #d3d2c5;
     --text: #0b1220;
     --muted: #475569;
+
     --panel: #e3e2d9;
     --border: #d6dee8;
-    --control-bg:#e3e2d9;
-    --control-border:#cbd5e1;
-    --tick:#cbd5e1;
 
-    --chart-border:#ffffff;
-    --center-fill: rgba(241,245,249,.92);
-    --center-stroke:#cbd5e1;
+    --control-bg: #e3e2d9;
+    --control-border: #cbd5e1;
+    --tick: #cbd5e1;
 
-    --loader-bg: rgba(247,250,252,.85);
+    --chart-border: #ffffff;
+    --center-fill: rgba(241, 245, 249, 0.92);
+    --center-stroke: #cbd5e1;
 
-    /* slightly desaturated green for light mode */
-    --slider-connect:#4aa37a;
-    --slider-handle:#ffffff;
-    --slider-handle-border:#cbd5e1;
+    --loader-bg: rgba(247, 250, 252, 0.85);
+
+    --slider-connect: #4aa37a;
+    --slider-handle: #ffffff;
+    --slider-handle-border: #cbd5e1;
 }
+
+/* =========================
+   Base layout & typography
+   ========================= */
 
 body {
     margin: 0;
@@ -48,17 +59,51 @@ body {
     color: var(--text);
 }
 
+select,
+button {
+    background: var(--control-bg);
+    color: var(--text);
+    border: 1px solid var(--control-border);
+    border-radius: 10px;
+    padding: 6px 8px;
+}
+
+.muted {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.bad {
+    color: #ffb4b4;
+}
+
+.details {
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.heading {
+    font-weight: 700;
+    font-size: 31px;
+}
+
+/* =========================
+   Header
+   ========================= */
+
 header {
     padding: 16px 28px;
     height: 120px;
     box-sizing: border-box;
     border-bottom: 1px solid var(--border);
+
     display: grid;
     grid-template-columns: 1fr 520px;
     grid-template-rows: auto auto;
     align-items: center;
     column-gap: 18px;
     row-gap: 10px;
+
     margin-bottom: 12px;
 }
 
@@ -70,8 +115,110 @@ header {
     }
 }
 
+/* =========================
+   Title block
+   ========================= */
+
+#titleBlock {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+#heading {
+    line-height: 1.05;
+}
+
+#headingSub {
+    display: block;
+}
+
+/* =========================
+   Controls block
+   ========================= */
+
+#controlsBlock {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+#controlsTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+#controlsBottom {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+#btnCol {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#btnCol button {
+    width: 90px;
+    height: 38px;
+    cursor: pointer;
+}
+
+#reset {
+    padding: 8px 14px;
+    border-radius: 12px;
+}
+
+#stat {
+    margin-left: 14px;
+    white-space: pre;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.9;
+    margin-top: 20px;
+}
+
+/* =========================
+   Year slider + ticks
+   ========================= */
+
 .sliderStack {
-    display: block
+    display: block;
+}
+
+#yearSlider {
+    width: 260px;
+}
+
+#yearSliderWrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    margin-right: 50px;
+}
+
+#yearLabel {
+    min-width: 60px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    padding: 4px 8px;
+    border: 1px solid #22314a;
+    border-radius: 20px;
+    background: #0f1726;
 }
 
 #yearTicks {
@@ -87,7 +234,7 @@ header {
     position: absolute;
     transform: translateX(-50%);
     white-space: nowrap;
-    opacity: .85;
+    opacity: 0.85;
 }
 
 .yearTick::before {
@@ -99,144 +246,102 @@ header {
     width: 1px;
     height: 6px;
     background: var(--tick);
-    opacity: .8;
+    opacity: 0.8;
 }
 
-/* title block */
-#titleBlock {
-    grid-column: 1;
-    grid-row: 1 / span 2;
+/* =========================
+   Year range inputs
+   ========================= */
+
+.yearInputs {
     display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 6px;
+    margin-top: 4px;
 }
 
-#heading {
-    line-height: 1.05
-}
+.yearInput {
+    width: 72px;
+    padding: 6px 8px;
 
-#headingSub {
-    display: block
-}
+    background: var(--control-bg);
+    color: var(--text);
 
+    border: 1px solid var(--control-border);
+    border-radius: 10px;
 
-/* controls block */
-#controlsBlock {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-}
-
-#yearLabel {
-    min-width: 60px;
-    text-align: right;
+    font-size: 12px;
     font-variant-numeric: tabular-nums;
-    padding: 4px 8px;
-    border: 1px solid #22314a;
-    border-radius: 20px;
-    background: #0f1726;
+    text-align: center;
+    box-sizing: border-box;
 }
 
-#yearSlider {
-    width: 260px;
+.yearInput:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(105, 179, 140, 0.35);
 }
 
-#reset {
-    padding: 8px 14px;
-    border-radius: 12px;
-}
-
-#stat {
-    margin-left: 14px;
-    white-space: pre;
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-    opacity: .9;
-    margin-top: 20px;
-}
-
-#controlsTop {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-#yearSliderWrap {
-    display: grid;
-    grid-template-columns:auto auto 1fr;
-    align-items: center;
-    gap: 10px;
+/* remove number input spinners (Chrome, Edge, Safari) */
+.yearInput::-webkit-outer-spin-button,
+.yearInput::-webkit-inner-spin-button {
+    -webkit-appearance: none;
     margin: 0;
 }
 
-
-#controlsBottom{
-    display:flex;
-    align-items:flex-start;
-    justify-content:space-between;
-    gap:12px;
-    margin-top:8px;
+/* remove number input spinners (Firefox) */
+.yearInput[type="number"] {
+    -moz-appearance: textfield;
 }
 
-#btnCol{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-}
 
-#btnCol button{
-    width:90px;         /* optional: makes both buttons same width */
-    height:38px;         /* optional: makes them look consistent */
-    cursor: pointer;
-}
-
-select, button {
-    background: var(--control-bg);
-    color: var(--text);
-    border: 1px solid var(--control-border);
-    border-radius: 10px;
-    padding: 6px 8px
-}
+/* =========================
+   Main grid layout
+   ========================= */
 
 #wrap {
     display: grid;
     grid-template-columns: minmax(420px, 1.3fr) minmax(180px, 0.45fr) minmax(420px, 1fr);
     gap: 16px;
     align-items: start;
+
     padding: 15px;
     box-sizing: border-box;
     width: 97%;
 }
 
-/* columns */
-#colSunburst { min-height: 560px; }
-#colDetails  { position: sticky; top: 12px; align-self: start}
-#colCharts   { display: flex; flex-direction: column; gap: 16px; }
-#chart, #barchart, #linechart{
+#colSunburst {
+    min-height: 560px;
+}
+
+#colDetails {
+    position: sticky;
+    top: 12px;
+    align-self: start;
+}
+
+#colCharts {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+#chart,
+#barchart,
+#linechart {
     width: 100%;
 }
 
-#charts {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+/* =========================
+   Cards & panels
+   ========================= */
+
+.card {
+    border-radius: 14px;
+    padding: 12px;
 }
 
-#barchart {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    min-height: 28vh;
-}
-
-#linechart {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    min-height: 28vh;
+.chartCard {
+    height: 320px;
 }
 
 #chart {
@@ -247,44 +352,58 @@ select, button {
     height: 560px;
 }
 
-.chartCard{
-    height: 320px; /* each right-side chart */
+#barchart,
+#linechart {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    min-height: 28vh;
 }
 
-
-.card{
-    border-radius: 14px;
-    padding: 12px;
-    /* background/border probably already exist in your theme; if not, add your colors here */
+#charts {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 }
 
-/* --- Language filter UI (details column bottom) --- */
-.panelSection{
+.panelSection {
     margin-top: 14px;
     padding-top: 12px;
     border-top: 1px solid var(--border);
 }
 
-.panelTitle{
+.panelTitle {
     font-size: 12px;
     color: var(--muted);
     font-weight: 700;
-    letter-spacing: .2px;
+    letter-spacing: 0.2px;
     margin-bottom: 8px;
     text-transform: uppercase;
 }
 
-.langButtons{
+#side {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 12px;
+}
+
+/* =========================
+   Language filter
+   ========================= */
+
+.langButtons {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
 }
 
-.langBtn{
+.langBtn {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
+
     padding: 8px 8px;
     border-radius: 12px;
     font-size: 12px;
@@ -292,23 +411,23 @@ select, button {
     max-width: 110px;
 }
 
-.langBtn.active{
-    outline: 3px solid rgba(105,179,140,.55);
+.langBtn.active {
+    outline: 3px solid rgba(105, 179, 140, 0.55);
 }
 
-.langPct{
+.langPct {
     color: var(--muted);
     font-variant-numeric: tabular-nums;
 }
 
-.langOtherRow{
+.langOtherRow {
     margin-top: 10px;
     display: grid;
     grid-template-columns: 1fr auto;
     gap: 8px;
 }
 
-.langOther{
+.langOther {
     width: 100%;
     background: var(--control-bg);
     color: var(--text);
@@ -319,104 +438,87 @@ select, button {
     box-sizing: border-box;
 }
 
-.langApply{
+.langApply {
     padding: 8px 10px;
     border-radius: 10px;
     font-size: 12px;
     cursor: pointer;
 }
 
-.langMsg{
+.langMsg {
     margin-top: 6px;
     font-size: 11px;
     color: var(--muted);
     min-height: 14px;
 }
 
-#side {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 12px
-}
+/* =========================
+   Chart tooltip helpers
+   ========================= */
 
-.muted {
-    color: var(--muted);
-    font-size: 12px
-}
-
-.bad {
-    color: #ffb4b4
-}
-
-.details {
-    font-weight: bold;
-    margin-left: 10px
-}
-
-.heading {
+.lcTipRow.isHover {
     font-weight: 700;
-    font-size: 31px
+    text-decoration: underline;
 }
 
-/* hide the old selects (we keep them for compatibility with existing code) */
-#s, #e {
-    display: none;
-}
+/* =========================
+   noUiSlider styling
+   ========================= */
 
-/* slider styling */
-#yearSliderWrap {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 20px;
-    margin-right: 50px;
-}
-
-/* noUiSlider theme tweaks */
 .noUi-target {
     background: var(--control-bg);
-    border:1px solid var(--control-border);
+    border: 1px solid var(--control-border);
     border-radius: 12px;
-    box-shadow: none
+    box-shadow: none;
 }
 
 .noUi-connect {
-    background: var(--slider-connect); border-radius:999px;
-
+    background: var(--slider-connect);
+    border-radius: 999px;
 }
 
 .noUi-handle {
     background: var(--slider-handle);
-    border:1px solid var(--slider-handle-border);
+    border: 1px solid var(--slider-handle-border);
     border-radius: 90%;
-    box-shadow: none
+    box-shadow: none;
 }
 
-.noUi-handle:before, .noUi-handle:after {
-    display: none
+.noUi-handle:before,
+.noUi-handle:after {
+    display: none;
 }
 
 .noUi-tooltip {
     background: var(--control-bg);
     color: var(--text);
-    border:1px solid var(--control-border);
-    border-radius: 10px
+    border: 1px solid var(--control-border);
+    border-radius: 10px;
 }
 
-.noUi-handle:hover { box-shadow: 0 0 0 6px rgba(59,130,246,.15); }
-.noUi-handle.noUi-active { box-shadow: 0 0 0 8px rgba(59,130,246,.20); }
+.noUi-handle:hover {
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.15);
+}
+
+.noUi-handle.noUi-active {
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.2);
+}
+
+/* =========================
+   Loading overlay
+   ========================= */
 
 #loading {
     position: fixed;
     inset: 0;
-    background: var(--loader-bg);;
+    background: var(--loader-bg);
     backdrop-filter: blur(2px);
+
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
     z-index: 9999;
 }
 
@@ -433,7 +535,7 @@ select, button {
     margin-top: 12px;
     color: var(--muted);
     font-size: 13px;
-    letter-spacing: .3px;
+    letter-spacing: 0.3px;
 }
 
 @keyframes spin {
@@ -442,13 +544,24 @@ select, button {
     }
 }
 
-@media (max-width: 1100px){
-    #wrap{
+/* =========================
+   Responsive
+   ========================= */
+
+@media (max-width: 1100px) {
+    #wrap {
         grid-template-columns: 1fr;
     }
-    #colDetails{
+
+    #colDetails {
         position: static;
     }
-    #chart{ height: 520px; }
-    .chartCard{ height: 300px; }
+
+    #chart {
+        height: 520px;
+    }
+
+    .chartCard {
+        height: 300px;
+    }
 }
