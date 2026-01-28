@@ -1,7 +1,7 @@
 import * as duckdb from "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.31.0/+esm";
 
 import {
-    BOOKS, MAP, DEFAULT, BUCKETS, INNER_RADIUS_PCT, NO_DATA_KEY,
+    BOOKS, MAP, DEFAULT, BUCKETS, NO_DATA_KEY,
     withLoading,
 } from "./config.js";
 
@@ -9,8 +9,14 @@ import { CONSPECT1_COLORS, derivedColor } from "./colors.js";
 
 
 const $ = (id) => document.getElementById(id);
-const S = $("s"), E = $("e"), stat = $("stat"), err = $("err");
-const iv = $("iv"), tot = $("tot");
+
+const yearFromInput = $("yearFrom");
+const yearToInput   = $("yearTo");
+const minY = 1995, maxY = 2023;
+
+const stat = $("stat"), err = $("err");
+const tot = $("tot");
+
 const authorsEl = $("authors");
 const publishersEl = $("publishers");
 const avgPagesEl = $("avgPages");
@@ -18,6 +24,7 @@ const avgAuthorsEl = $("avgAuthors");
 const heading = $("heading");
 const yearSliderEl = $("yearSlider");
 
+// Language filter UI (optional if DOM not present)
 const langButtonsWrap = $("langButtons");
 const langOtherInput = $("langOther");
 const langOtherApply = $("langOtherApply");
@@ -26,6 +33,10 @@ const langMsg = $("langMsg");
 const chart = echarts.init($("chart"), null, { renderer: "canvas" });
 const barChart = echarts.init($("barchart"), null, { renderer: "canvas" });
 const lineChart = echarts.init($("linechart"), null, { renderer: "canvas" });
+
+let lcHoveredSeriesName = null;
+let lcAxisDataIndex = null;
+
 let conn;
 
 let firstRender = true;
@@ -43,8 +54,11 @@ let zrCenterClickHandler = null;
 
 let slider = null;
 
-// Language filter
-const FIXED_LANGS = ["cze", "eng", "slo", "ger"];
+let lineHoverSeriesName = null;
+let lastLineTipDataIndex = null;
+
+// --- Language filter state ---
+const FIXED_LANGS = ["cze", "eng", "slo", "ger", "pol"]; // buttons shown in UI
 let activeLanguage = "all";
 let availableLanguages = new Set();
 
@@ -95,6 +109,7 @@ function currentHeading(view) {
     return { title: `${c1Name} → ${c2Name}` };
 }
 
+
 async function loadMapping() {
     const text = await (await fetch(MAP)).text();
     const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
@@ -116,10 +131,16 @@ async function loadMapping() {
         const name = String(r[nmCol] ?? "").trim();
         if (!name || c1 === "") continue;
 
+        // top-level
         if (isMissing(r[c2Col]) && isMissing(r[c3Col])) m1.set(c1, name);
+
+        // 2nd-level
         if (!isMissing(r[c2Col]) && isMissing(r[c3Col]) && c2 !== "") m2.set(`${c1}|${c2}`, name);
+
+        // 3rd-level
         if (!isMissing(r[c2Col]) && !isMissing(r[c3Col]) && c2 !== "" && c3 !== "") m3.set(`${c1}|${c2}|${c3}`, name);
     }
+
     mapC1 = m1; mapC2 = m2; mapC3 = m3;
 }
 
@@ -137,6 +158,27 @@ async function initDuckDB() {
     const resp = await fetch(BOOKS);
     if (!resp.ok) throw new Error(`Fetch failed for ${BOOKS}: HTTP ${resp.status}`);
     await db.registerFileBuffer(BOOKS, new Uint8Array(await resp.arrayBuffer()));
+    // After: await db.registerFileBuffer(...)
+
+    stat.textContent = "Preparing table…";
+
+    await conn.query(`
+  CREATE TEMP TABLE books_t AS
+  SELECT
+    CAST(start_interval_year AS INT) AS s_year,
+    CAST(end_interval_year   AS INT) AS e_year,
+    LOWER(TRIM(CAST(language  AS VARCHAR))) AS language,
+    TRIM(CAST(conspect1 AS VARCHAR)) AS conspect1,
+    TRIM(CAST(conspect2 AS VARCHAR)) AS conspect2,
+    TRIM(CAST(conspect3 AS VARCHAR)) AS conspect3,
+    CAST(books AS BIGINT) AS books,
+    CAST(authors AS BIGINT) AS authors,
+    CAST(publishers AS BIGINT) AS publishers,
+    CAST(pages AS BIGINT) AS pages,
+    CAST(avg_authors_per_book AS DOUBLE) AS avg_authors_per_book
+  FROM read_csv_auto('${BOOKS}')
+`);
+
 }
 
 async function yearBounds() {
@@ -150,22 +192,17 @@ async function yearBounds() {
     return { minY: Number(r.minY), maxY: Number(r.maxY) };
 }
 
-function fillYears(minY, maxY) {
-    // keep selects populated (hidden) -> code still reads S.value / E.value
-    S.innerHTML = ""; E.innerHTML = "";
-    for (let y = minY; y <= maxY; y++) { S.add(new Option(y, y)); E.add(new Option(y, y)); }
-
+function initYearInputs(minY, maxY) {
     const s0 = Math.max(minY, Math.min(maxY, DEFAULT.s));
     const e0 = Math.max(minY, Math.min(maxY, DEFAULT.e));
 
-    S.value = String(s0);
-    E.value = String(e0);
-    if (+E.value < +S.value) E.value = S.value;
+    yearFromInput.value = String(s0);
+    yearToInput.value   = String(e0);
 }
 
 function initYearSlider(minY, maxY) {
-    const s0 = +S.value;
-    const e0 = +E.value;
+    const s0 = +yearFromInput.value;
+    const e0 = +yearToInput.value;
 
     if (slider) {
         slider.destroy();
@@ -184,13 +221,13 @@ function initYearSlider(minY, maxY) {
         }
     });
 
+    // live update (don’t refresh on every move)
     slider.on("update", (values) => {
         const a = +values[0], b = +values[1];
         const s = Math.min(a, b);
         const e = Math.max(a, b);
-        S.value = String(s);
-        E.value = String(e);
-        iv.innerHTML = `<b>${s}–${e}</b>`;
+        yearFromInput.value = String(s);
+        yearToInput.value   = String(e);
     });
 
     // refresh only when user releases handle
@@ -198,6 +235,28 @@ function initYearSlider(minY, maxY) {
         resetAll();
     });
 }
+
+function clampYear(v) {
+    const n = parseInt(v, 10);
+    if (!Number.isFinite(n)) return null;
+    return Math.max(minY, Math.min(maxY, n));
+}
+
+function syncInputsToSlider() {
+    const a = clampYear(yearFromInput.value);
+    const b = clampYear(yearToInput.value);
+    if (a == null || b == null) return;
+
+    const s = Math.min(a, b);
+    const e = Math.max(a, b);
+
+    // This triggers slider's "set" event => resetAll()
+    slider.set([s, e]);
+}
+
+yearFromInput.addEventListener("change", syncInputsToSlider);
+yearToInput.addEventListener("change", syncInputsToSlider);
+
 
 async function loadLanguages() {
     const q = `
@@ -263,6 +322,7 @@ function initLanguageUI() {
         if (!raw) return;
 
         if (!availableLanguages || availableLanguages.size === 0) {
+            // languages not loaded yet: accept, but might yield 0 results
             setActiveLanguage(raw);
             return;
         }
@@ -282,6 +342,7 @@ function initLanguageUI() {
             }
         });
     }
+
     updateLanguageUI();
 }
 
@@ -340,6 +401,8 @@ async function queryDetailsForSelection(s, e, view, lang = activeLanguage) {
     if (view.depth >= 1) filters.push(`TRIM(CAST(conspect1 AS VARCHAR)) = '${sqlStr(view.c1)}'`);
     if (view.depth >= 2) filters.push(`TRIM(CAST(conspect2 AS VARCHAR)) = '${sqlStr(view.c2)}'`);
 
+    // avg_authors_per_book je už "průměr na knihu" v datasetu,
+    // takže pro agregaci přes více řádků děláme vážený průměr podle počtu knih.
     const q = `
     SELECT
       SUM(books)        AS books,
@@ -401,7 +464,7 @@ async function queryBooksPerYear(s, e, view, lang = activeLanguage) {
 
 async function queryLinesForView(s, e, view, lang = activeLanguage) {
     const targetCol = view.depth === 0 ? 'conspect1' : (view.depth === 1 ? 'conspect2' : 'conspect3');
-    
+
     const filters = [
         `language='${sqlStr(lang)}'`,
         `CAST(start_interval_year AS INT) >= ${s}`,
@@ -483,12 +546,13 @@ async function queryLanguageTotalsForSelection(s, e, view, languages) {
         const l = String(r.language ?? '').trim().toLowerCase();
         m.set(l, Number(r.books ?? 0));
     }
-
+    // ensure keys exist with 0
     for (const l of langs) if (!m.has(l)) m.set(l, 0);
     return m;
 }
 
 function updateLanguagePercentages(langStats) {
+    // Supports both Map (preferred) and plain object.
     const get = (k) => {
         if (!langStats) return 0;
         if (langStats instanceof Map) return Number(langStats.get(k) ?? 0);
@@ -505,7 +569,7 @@ function updateLanguagePercentages(langStats) {
             pct = (lang === activeLanguage) ? 100 : 0;
         } else {
             const num = get(lang);
-            pct = totalAll > 0 ? Math.round((num / totalAll) * 100) : 0;
+            pct = totalAll > 0 ? Math.round((num / totalAll) * 1000)/10 : 0;
         }
 
         el.textContent = `${pct}%`;
@@ -516,7 +580,6 @@ function updateLanguagePercentages(langStats) {
 
 
 function updateSide(s, e, view, total) {
-    iv.innerHTML = `<b>${s}–${e}</b>`;
     tot.textContent = fmt(total);
 
     const h = currentHeading(view);
@@ -538,6 +601,7 @@ function updateDetails(d) {
     const avgPages = d.pages / d.books;
     avgPagesEl.textContent = `${avgPages.toFixed(0)}`;
 
+    // buď přímo z datasetu (avg_authors_per_book), nebo váženě spočítané v dotazu
     avgAuthorsEl.textContent = `${Number(d.avg_authors_per_book).toFixed(2)}`;
 
 }
@@ -556,12 +620,15 @@ function setCenterBackHandler() {
         const dist = Math.sqrt(dx*dx + dy*dy);
 
         const R = Math.min(w, h) / 2;
-        const inner = R * INNER_RADIUS_PCT;
+        const inner = R * 0.55;
 
         if (dist <= inner) {
-            stack.pop();
-            refresh();
+            withLoading(async () => {
+                stack.pop();
+                await refresh();
+            });
         }
+
     };
 
     zr.on("click", zrCenterClickHandler);
@@ -600,12 +667,18 @@ function renderChart(data, s, e, view) {
             data: data.map(d => {
                 const key = d.key;
 
+                // base color always comes from conspect1 selection:
+                // depth 0: slice IS conspect1 key
+                // depth 1/2: parent conspect1 is view.c1
                 const parentC1 = (view.depth === 0) ? key : view.c1;
                 const base = CONSPECT1_COLORS[parentC1] ?? "#64748b";
 
                 let color = base;
 
+                // derive colors for lower layers
                 if (view.depth >= 1) {
+                    // depth 1: vary by conspect2 key
+                    // depth 2: vary by conspect3 key (still anchored to conspect1 base)
                     color = derivedColor(base, parentC1, key, view.depth);
                 }
 
@@ -638,46 +711,32 @@ function renderChart(data, s, e, view) {
     chart.on("click", (params) => {
         const key = params?.data?.key;
         if (key == null) return;
-
         if (key === NO_DATA_KEY) return;
 
         const cur = stack[stack.length - 1];
 
         if (cur.depth === 0) {
-            stack.push({ depth: 1, c1: key, c2: null });
-            refresh();
+            withLoading(async () => {
+                stack.push({ depth: 1, c1: key, c2: null });
+                await refresh();
+            });
         } else if (cur.depth === 1) {
-            stack.push({ depth: 2, c1: cur.c1, c2: key });
-            refresh();
+            withLoading(async () => {
+                stack.push({ depth: 2, c1: cur.c1, c2: key });
+                await refresh();
+            });
         }
     });
+
 
     setCenterBackHandler();
     stat.textContent = `Interval ${s}–${e}\r\nHloubka ${view.depth}`;
 }
 
-function highlightSunburstByKey(key) {
-    if (key == null) return;
-    if (key === NO_DATA_KEY) return;
-
-    const opt = chart.getOption();
-    const data = opt?.series?.[0]?.data ?? [];
-    const idx = data.findIndex(d => d?.key === key);
-    if (idx < 0) return;
-
-    // shodit staré zvýraznění a zvýraznit jen tento slice
-    chart.dispatchAction({ type: "downplay", seriesIndex: 0 });
-    chart.dispatchAction({ type: "highlight", seriesIndex: 0, dataIndex: idx });
-}
-
-function clearSunburstHighlight() {
-    chart.dispatchAction({ type: "downplay", seriesIndex: 0 });
-}
-
 function renderBarChart(rows, view) {
     const css = getComputedStyle(document.body);
     const mutedColor = css.getPropertyValue("--muted").trim();
-    
+
     let barColor = "#3b82f6";
     if (view.depth >= 1) {
         barColor = CONSPECT1_COLORS[view.c1] ?? barColor;
@@ -754,18 +813,22 @@ function renderLineChart(rows, view) {
         };
     });
 
+    // --- NEW: keep track of which line is currently hovered ---
+    // Put this near the top-level of your file if you prefer, but this works too.
+    if (!renderLineChart._hover) renderLineChart._hover = { seriesName: null };
+    const hoverState = renderLineChart._hover;
+
     lineChart.setOption({
         backgroundColor: "transparent",
         animation: true,
         title: {
-            text: 'Popularita jednotlivých podkategorií',
+            text: "Popularita jednotlivých podkategorií",
             left: 12,
             top: 6,
             textStyle: {
                 fontSize: 12,
                 fontWeight: 600,
-                color: getComputedStyle(document.body)
-                    .getPropertyValue('--muted')
+                color: getComputedStyle(document.body).getPropertyValue("--muted")
             }
         },
         grid: { top: 50, right: 20, bottom: 40, left: 60 },
@@ -774,11 +837,25 @@ function renderLineChart(rows, view) {
             : undefined,
         tooltip: {
             trigger: "axis",
-            formatter: (params) =>
-                `<b>${params[0].axisValue}</b><br/>` +
-                params.map(p =>
-                    `${p.marker}${p.seriesName}: ${fmt(p.value)}`
-                ).join("<br/>")
+            renderMode: "html",
+            appendToBody: true,
+            formatter: (params) => {
+                if (!params?.length) return "";
+
+                const year = params[0].axisValue;
+
+                const rows = params.map(p => {
+                    const isHover = lcHoveredSeriesName && p.seriesName === lcHoveredSeriesName;
+
+                    const name = isHover
+                        ? `<span style="font-weight:800;text-decoration:underline">${escapeHtml(p.seriesName)}</span>`
+                        : escapeHtml(p.seriesName);
+
+                    return `<div>${p.marker}${name}: ${fmt(p.value)}</div>`;
+                }).join("");
+
+                return `<b>${escapeHtml(String(year))}</b><br/>${rows}`;
+            }
         },
         xAxis: {
             type: "category",
@@ -792,13 +869,37 @@ function renderLineChart(rows, view) {
             splitLine: { lineStyle: { opacity: 0.1 } }
         },
         series
-
     }, true);
+
+    lineChart.off("updateAxisPointer");
+
+    lineChart.on("updateAxisPointer", (e) => {
+        const info = e?.axesInfo?.[0];
+        if (!info) return;
+
+        // index on x-axis
+        lcAxisDataIndex = info.value; // for category axis this is usually the category value
+        // BUT we need dataIndex; seriesData[0].dataIndex is safest when present:
+        const sd = info.seriesData;
+
+        if (sd && sd.length) {
+            // Pick the series "under" the pointer. If multiple, you can choose max value etc.
+            lcHoveredSeriesName = sd[0].seriesName;
+
+            // Force re-render tooltip so formatter runs with updated lcHoveredSeriesName
+            lineChart.dispatchAction({
+                type: "showTip",
+                seriesIndex: sd[0].seriesIndex,
+                dataIndex: sd[0].dataIndex
+            });
+        }
+    });
 }
+
 
 async function refresh() {
     err.style.display = "none";
-    const s = +S.value, e = +E.value;
+    const s = +yearFromInput.value, e = +yearToInput.value;
     const view = stack[stack.length - 1];
 
     stat.textContent = `Query: ${s}–${e}\r\nHloubka ${view.depth}…`;
@@ -813,14 +914,17 @@ async function refresh() {
         queryDetailsForSelection(s, e, view, activeLanguage),
     ]);
 
+    // language UI always
     updateLanguagePercentages(langTotals);
 
+    // details + header always (even if charts have no rows)
     lastDetails = details;
 
     const totalBooks = Number(details?.books ?? 0);
     updateSide(s, e, view, totalBooks);   // interval + total + heading
     updateDetails(details);               // <-- NEW: fill authors/publishers/avg/illustrated
 
+    // no data: clear charts but keep UI consistent
     if (!pieRows.length) {
         chart.clear();
         barChart.clear();
@@ -850,7 +954,7 @@ function renderYearTicks(minY, maxY) {
     ticksEl.innerHTML = "";
 
     for (let y = minY; y <= maxY; y++) {
-        if (y % 10 !== 0 && y !== 1995 && y !== 2023) continue; // only decades
+        if (y % 10 !== 0 && y !== minY && y !== maxY) continue; // only decades
         const span = document.createElement("span");
         span.className = "yearTick";
         span.textContent = String(y);
@@ -877,8 +981,15 @@ function applyTheme(light) {
     });
 }
 
-
-
+function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    }[c]));
+}
 
 (async () => {
     try {
@@ -904,8 +1015,9 @@ function applyTheme(light) {
         minYGlobal = minY;
         maxYGlobal = maxY;
 
-        fillYears(minY, maxY);
+        initYearInputs(minY, maxY);
         initYearSlider(minY, maxY);
+
         if (minYGlobal != null) renderYearTicks(minYGlobal, maxYGlobal);
 
         let stored = null;
@@ -916,9 +1028,10 @@ function applyTheme(light) {
 
 
         $("reset").onclick = () => {
+            // reset slider + drill stack
             const s0 = Math.max(minY, Math.min(maxY, DEFAULT.s));
             const e0 = Math.max(minY, Math.min(maxY, DEFAULT.e));
-            slider.set([s0, e0]);
+            slider.set([s0, e0]); // triggers resetAll via 'set'
         };
 
         await resetAll();
